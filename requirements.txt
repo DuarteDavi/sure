@@ -7,8 +7,10 @@ requests
 eventlet
 python-dotenv
 toml
-mysql-connector-python
-beautifulsoup4
-pyTelegramBotAPI
-pandas
 colorama
+playwright
+beautifulsoup4
+pandas
+mysql-connector-python
+pyTelegramBotAPI
+simple-websocket
