@@ -109,9 +109,9 @@ wsproto==1.2.0
 WTForms==3.2.1
 yarl==1.13.1
 zipp==3.21.0
-flask
-flask-socketio
-requests
-eventlet
-flask-sqlalchemy
+flask==3.0.0
+flask-socketio==5.3.6
+requests==2.31.0
+eventlet==0.33.3
+python-dotenv==1.0.0
 # Adicione aqui qualquer outra biblioteca que o seu projeto original use
