@@ -1,5 +1,13 @@
 flask
 flask-socketio
+flask-sqlalchemy
+flask-login
+flask-wtf
 requests
 eventlet
 python-dotenv
+toml
+mysql-connector-python
+beautifulsoup4
+pyTelegramBotAPI
+pandas
