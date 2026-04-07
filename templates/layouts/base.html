@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="icon" type="image/png" href="/static/assets/img/logo.png">
+
+    <title>
+        MTSUREBET SOFTWARE - {% block title %}{% endblock %}
+    </title>
+
+    <link href="https://fonts.googleapis.com/css?family=Poppins:200,300,400,600,700,800" rel="stylesheet" />
+    <link href="https://use.fontawesome.com/releases/v5.0.6/css/all.css" rel="stylesheet">
+    
+    <link href="/static/assets/css/nucleo-icons.css" rel="stylesheet" />
+    <link href="/static/assets/css/black-dashboard.css?v=1.1.1" rel="stylesheet" />
+
+    <style>
+        :root {
+            --sb-bg-main: #f5f7fa;
+            --sb-sidebar-bg: #2d3e50; /* Azul escuro Surebet */
+            --sb-text-main: #333333;
+        }
+
+        /* Força o fundo claro em todo o site */
+        body, .wrapper, .main-panel {
+            background: var(--sb-bg-main) !important;
+            color: var(--sb-text-main) !important;
+        }
+
+        /* Reseta a cor dos textos para escuro */
+        p, h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6, span {
+            color: var(--sb-text-main);
+        }
+
+        /* Sidebar: Muda do preto/neon para o Azul Surebet */
+        .sidebar, .sidebar-wrapper {
+            background: var(--sb-sidebar-bg) !important;
+            box-shadow: none !important;
+        }
+        /* Links da sidebar */
+        .sidebar .nav li > a, .sidebar .nav li > a i {
+            color: #bdc3c7 !important; /* Cinza claro */
+        }
+        .sidebar .nav li.active > a {
+            color: #ffffff !important;
+            background: rgba(255,255,255,0.1) !important;
+        }
+        .sidebar .nav li.active > a i {
+            color: #ffffff !important;
+        }
+        .sidebar .logo a.simple-text {
+            color: #ffffff !important;
+        }
+
+        /* Navbar Superior (Se houver) */
+        .navbar {
+            background: #ffffff !important;
+            border-bottom: 1px solid #e0e0e0 !important;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important;
+            padding-bottom: 10px !important;
+            padding-top: 10px !important;
+        }
+        .navbar .navbar-brand {
+            color: var(--sb-sidebar-bg) !important; 
+        }
+        .navbar-toggler-bar {
+            background: var(--sb-sidebar-bg) !important;
+        }
+
+        /* Cards globais (Reset para branco com sombra suave) */
+        .card {
+            background: #ffffff !important;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
+            border: 1px solid #e1e4e8 !important;
+            border-radius: 4px !important;
+        }
+
+        .card-header {
+            border-bottom: 1px solid #eee !important;
+            margin-left: 0 !important; 
+        }
+        .card-title {
+            color: var(--sb-sidebar-bg) !important;
+        }
+        
+        /* Footer */
+        footer {
+            background: transparent !important;
+            color: #777 !important;
+        }
+        footer .nav-link {
+            color: #777 !important;
+        }
+    </style>
+
+    {% block stylesheets %}{% endblock stylesheets %}
+        
+</head>
+<body class="">
+
+    <div class="wrapper">
+
+        {% include 'includes/sidebar.html' %}
+
+        <div class="main-panel">
+
+            {% include 'includes/navigation.html' %}
+
+            {% block content %}{% endblock content %}
+
+            {% include 'includes/footer.html' %}
+
+        </div>
+    </div>
+
+    {% include 'includes/fixed-plugin.html' %}
+
+    {% include 'includes/scripts.html' %}
+
+    {% block javascripts %}{% endblock javascripts %}
+
+</body>
+</html>

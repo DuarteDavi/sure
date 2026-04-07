@@ -1,0 +1,233 @@
+<div class="custom-modal" id="calc-modal" style="display:none;">
+    <div class="custom-modal-content">
+        
+        <div class="modal-header-custom">
+            <h5 class="m-0 font-weight-bold" style="color: #2d3e50;"><i class="fas fa-calculator mr-2"></i> Calculadora de Arbitragem</h5>
+            <span class="custom-modal-close" onclick="fecharModal()">&times;</span>
+        </div>
+
+        <div class="calc-body">
+            
+            <div class="calc-info-box mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-2 border-bottom pb-2">
+                    <span class="text-muted small font-weight-bold">EVENTO</span>
+                    <strong id="calc-evento" class="text-dark text-right text-truncate" style="max-width: 200px;">--</strong>
+                </div>
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="text-muted small font-weight-bold">MERCADO</span>
+                    <span id="calc-mercado" class="text-primary font-weight-bold">--</span>
+                </div>
+            </div>
+
+            <form id="surebet-form" onsubmit="event.preventDefault(); calcularSurebet();">
+                
+                <div class="row mb-3">
+                    <div class="col-4 pr-1">
+                        <label class="small text-muted font-weight-bold">Odd 1</label>
+                        <input type="number" id="odd1" step="0.01" class="form-control calc-input" required placeholder="0.00">
+                    </div>
+                    <div class="col-4 px-1">
+                        <label class="small text-muted font-weight-bold">Odd 2</label>
+                        <input type="number" id="odd2" step="0.01" class="form-control calc-input" required placeholder="0.00">
+                    </div>
+                    <div class="col-4 pl-1">
+                        <label class="small text-muted font-weight-bold">Odd 3 (Op)</label>
+                        <input type="number" id="odd3" step="0.01" class="form-control calc-input" placeholder="-">
+                    </div>
+                </div>
+
+                <div class="form-group mb-4">
+                    <label class="small text-muted font-weight-bold">INVESTIMENTO TOTAL</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text bg-light font-weight-bold text-muted" style="border-right:0;">R$</span>
+                        </div>
+                        <input type="number" id="stake" step="0.01" class="form-control calc-input border-left-0" required value="100.00" placeholder="100.00">
+                    </div>
+                </div>
+
+                <button type="button" onclick="calcularSurebet()" class="btn btn-calc-action btn-block shadow-sm">
+                    CALCULAR RETORNOS
+                </button>
+            </form>
+
+            <div id="resultado-container" class="mt-3" style="display:none;">
+                <div id="resultado" class="alert border-0 shadow-sm" role="alert"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Função para fechar o modal corretamente
+    function fecharModal() {
+        document.getElementById('calc-modal').style.display = 'none';
+    }
+
+    function abrirCalculadoraModal({evento, mercado, chance, odd1, odd2, odd3}) {
+        const modal = document.getElementById('calc-modal');
+        modal.style.display = 'flex'; // Usa Flex para centralizar
+        
+        document.getElementById('calc-evento').textContent = evento || 'Evento Desconhecido';
+        document.getElementById('calc-evento').title = evento || ''; 
+        document.getElementById('calc-mercado').textContent = mercado || '-';
+        
+        document.getElementById('odd1').value = odd1 || '';
+        document.getElementById('odd2').value = odd2 || '';
+        document.getElementById('odd3').value = odd3 || '';
+        
+        // Reseta o stake se estiver vazio
+        if(!document.getElementById('stake').value) {
+            document.getElementById('stake').value = '100.00'; 
+        }
+        
+        document.getElementById('resultado-container').style.display = 'none';
+        document.getElementById('resultado').innerHTML = '';
+    }
+
+    function calcularSurebet() {
+        let odd1 = parseFloat(document.getElementById("odd1").value.replace(',', '.'));
+        let odd2 = parseFloat(document.getElementById("odd2").value.replace(',', '.'));
+        let odd3 = parseFloat(document.getElementById("odd3").value.replace(',', '.')) || 0;
+        let stake = parseFloat(document.getElementById("stake").value.replace(',', '.'));
+        
+        const resContainer = document.getElementById('resultado-container');
+        const resDiv = document.getElementById('resultado');
+        resContainer.style.display = 'block';
+
+        if (odd1 > 1 && odd2 > 1 && stake > 0) {
+            let totalInverse = (1 / odd1) + (1 / odd2) + (odd3 > 1 ? (1 / odd3) : 0);
+            
+            if (totalInverse < 1) {
+                // Lucro
+                let stake1 = (stake * (1 / odd1)) / totalInverse;
+                let stake2 = (stake * (1 / odd2)) / totalInverse;
+                let stake3 = odd3 > 1 ? (stake * (1 / odd3)) / totalInverse : 0;
+                let profit = stake * (1 - totalInverse) / totalInverse;
+                let profitPercent = ((1 - totalInverse) / totalInverse) * 100;
+
+                resDiv.className = 'alert alert-success';
+                resDiv.innerHTML = `
+                    <div class="text-center mb-3"><strong class="text-success" style="font-size: 1.1rem"><i class="fas fa-check-circle"></i> Lucro: R$ ${profit.toFixed(2)} (${profitPercent.toFixed(2)}%)</strong></div>
+                    <div class="d-flex justify-content-between mb-1 small border-bottom pb-1"><span>Aposta 1 (@${odd1}):</span> <strong>R$ ${stake1.toFixed(2)}</strong></div>
+                    <div class="d-flex justify-content-between mb-1 small border-bottom pb-1"><span>Aposta 2 (@${odd2}):</span> <strong>R$ ${stake2.toFixed(2)}</strong></div>
+                    ${odd3 > 1 ? `<div class="d-flex justify-content-between mb-1 small border-bottom pb-1"><span>Aposta 3 (@${odd3}):</span> <strong>R$ ${stake3.toFixed(2)}</strong></div>` : ''}
+                `;
+            } else {
+                // Prejuízo
+                let lossPercent = (totalInverse - 1) * 100;
+                resDiv.className = 'alert alert-danger';
+                resDiv.innerHTML = `
+                    <div class="text-center">
+                        <strong><i class="fas fa-times-circle"></i> Sem Lucro Garantido</strong><br>
+                        <small>Prejuízo estimado: -${lossPercent.toFixed(2)}%</small>
+                    </div>
+                `;
+            }
+        } else {
+            resDiv.className = 'alert alert-warning text-center';
+            resDiv.innerHTML = "<small>⚠️ Preencha as odds corretamente.</small>";
+        }
+    }
+    
+    // Fecha ao clicar fora
+    window.onclick = function(event) {
+        const modal = document.getElementById('calc-modal');
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }
+</script>
+
+<style>
+    /* Overlay Fixo */
+    .custom-modal {
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(3px);
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 15px; /* Margem segura no mobile */
+    }
+
+    /* Card do Modal */
+    .custom-modal-content {
+        background: #ffffff;
+        border-radius: 10px;
+        width: 100%;
+        max-width: 400px; /* Largura ideal */
+        box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+        border: 1px solid #e0e0e0;
+        overflow: hidden;
+        animation: fadeIn 0.3s ease-out;
+    }
+
+    /* Cabeçalho */
+    .modal-header-custom {
+        background: #f8f9fa;
+        padding: 15px 20px;
+        border-bottom: 1px solid #eee;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .custom-modal-close {
+        font-size: 1.5rem;
+        color: #999;
+        cursor: pointer;
+        line-height: 1;
+        transition: 0.2s;
+    }
+    .custom-modal-close:hover { color: #333; }
+
+    /* Corpo */
+    .calc-body { padding: 20px; }
+
+    /* Info Box */
+    .calc-info-box {
+        background: #f1f8ff;
+        border-radius: 6px;
+        padding: 12px;
+        border: 1px solid #d0e3f5;
+    }
+
+    /* Inputs */
+    .calc-input {
+        border: 1px solid #ced4da;
+        border-radius: 6px;
+        padding: 10px;
+        font-size: 1rem;
+        font-weight: 600;
+        color: #333;
+        height: auto;
+    }
+    .calc-input:focus {
+        border-color: #3498db;
+        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.15);
+        outline: none;
+    }
+
+    /* Botão */
+    .btn-calc-action {
+        background-color: #27ae60;
+        color: white;
+        font-weight: 700;
+        padding: 12px;
+        border-radius: 6px;
+        border: none;
+        transition: 0.2s;
+    }
+    .btn-calc-action:hover {
+        background-color: #219150;
+        transform: translateY(-1px);
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>

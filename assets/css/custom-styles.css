@@ -1,0 +1,15 @@
+.betting-signals-container {
+    display: flex;
+    flex-direction: row; /* Alinha os itens verticalmente */
+    gap: 10px; /* Espaçamento entre as linhas */
+}
+
+.betting-signals-container .card {
+    width: 100%; /* Faz com que cada linha ocupe toda a largura disponível */
+    min-height: 50px; /* Altura mínima de cada linha */
+    display: flex;
+    align-items: center; /* Alinha o conteúdo verticalmente no centro */
+    padding: 10px;
+    border: 1px solid #51ff00;
+    background-color: #000000;
+} 

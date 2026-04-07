@@ -1,0 +1,365 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Gerenciar Usuários {% endblock %}
+
+{% block stylesheets %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"> 
+
+<style>
+    /* --- VARIÁVEIS GERAIS --- */
+    :root {
+        --sb-blue-header: #2d3e50; 
+        --sb-bg-main: #f5f7fa;
+        --sb-bg-white: #ffffff;
+        --sb-text-dark: #333333;
+        --sb-text-muted: #777777;
+        --sb-link-blue: #3498db;
+        --sb-border-light: #ced4da;
+    }
+
+    /* Reset básico */
+    body {
+        color: var(--sb-text-dark) !important;
+        background-color: var(--sb-bg-main) !important;
+    }
+
+    h2, h3, h4, h5 {
+        color: var(--sb-blue-header) !important;
+        font-weight: 700;
+    }
+
+    /* Cards principais */
+    .card {
+        background-color: var(--sb-bg-white) !important;
+        border: 1px solid var(--sb-border-light) !important;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.05) !important;
+        border-radius: 8px;
+    }
+    .card-body { padding: 20px; }
+
+    /* Inputs e Labels */
+    .form-control {
+        background-color: #ffffff !important;
+        color: #333333 !important;
+        border: 1px solid #ced4da !important;
+        border-radius: 4px;
+        height: 40px;
+    }
+    .form-control:focus {
+        border-color: var(--sb-link-blue) !important;
+        box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25) !important;
+    }
+    label {
+        color: var(--sb-text-dark) !important;
+        font-weight: 600;
+        margin-bottom: 5px;
+    }
+
+    /* Botões */
+    .btn-add-user {
+        background-color: var(--sb-blue-header);
+        color: white;
+        border: none;
+        font-weight: 600;
+        padding: 10px 20px;
+        border-radius: 4px;
+    }
+    .btn-add-user:hover { background-color: #1a252f; color: white; }
+
+    .btn-search {
+        background-color: var(--sb-link-blue);
+        color: white;
+        border: none;
+        border-radius: 4px;
+        width: 100%;
+        height: 40px;
+    }
+    .btn-search:hover { background-color: #2980b9; color: white; }
+
+    /* Ações na tabela */
+    .btn-action-edit { color: var(--sb-link-blue); background: transparent; border: none; font-size: 1.2rem; cursor: pointer; }
+    .btn-action-delete { color: #dc3545; background: transparent; border: none; font-size: 1.2rem; cursor: pointer; }
+
+    /* --- ESTILIZAÇÃO DA TABELA (RESPONSIVA) --- */
+    .operation-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 1rem;
+        background-color: transparent;
+    }
+
+    /* Cabeçalho Desktop */
+    .operation-table thead {
+        background-color: #f8f9fa;
+        border-bottom: 2px solid var(--sb-border-light);
+    }
+    .operation-table th {
+        padding: 15px;
+        color: var(--sb-blue-header);
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        text-align: center;
+    }
+    .operation-table td {
+        padding: 12px;
+        vertical-align: middle;
+        border-top: 1px solid var(--sb-border-light);
+        text-align: center;
+        color: var(--sb-text-dark);
+    }
+
+    /* --- MEDIA QUERY: TRANSFORMA TABELA EM CARDS NO MOBILE (< 992px) --- */
+    @media (max-width: 991.98px) {
+        /* Esconde o cabeçalho da tabela */
+        .operation-table thead {
+            display: none;
+        }
+
+        /* Transforma a tabela em blocos */
+        .operation-table, .operation-table tbody, .operation-table tr, .operation-table td {
+            display: block;
+            width: 100%;
+        }
+
+        /* Estiliza cada linha como um Card */
+        .operation-table tr {
+            margin-bottom: 15px;
+            background-color: #fff;
+            border: 1px solid var(--sb-border-light);
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            padding: 15px;
+        }
+
+        /* Estiliza cada célula como uma linha do card */
+        .operation-table td {
+            text-align: right; /* Conteúdo à direita */
+            padding-left: 50%; /* Espaço para o label */
+            position: relative;
+            border: none;
+            border-bottom: 1px dashed #eee;
+            padding: 10px 0;
+        }
+
+        .operation-table td:last-child {
+            border-bottom: none;
+        }
+
+        /* Adiciona o LABEL (ex: Username:) usando o atributo data-label */
+        .operation-table td::before {
+            content: attr(data-label);
+            position: absolute;
+            left: 0;
+            width: 50%;
+            padding-right: 10px;
+            white-space: nowrap;
+            text-align: left;
+            font-weight: 700;
+            color: var(--sb-text-muted);
+        }
+        
+        /* Ajuste visual para os botões de ação no mobile */
+        .operation-table td:last-child {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+        }
+    }
+
+    /* Modal */
+    .modal-content { background-color: #fff; color: #333; }
+    .modal-header { border-bottom: 1px solid #eee; background-color: #f8f9fa; }
+    .modal-footer { border-top: 1px solid #eee; }
+    .close { color: #333; }
+</style>
+{% endblock stylesheets %}
+
+{% block content %}
+<div class="content">
+    <div class="container mt-5">
+        
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2><i class="fas fa-users-cog mr-2"></i> Gerenciar Usuários</h2>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <div class="row align-items-end mb-4">
+                    <div class="col-md-6 mb-3 mb-md-0">
+                        <label for="searchUsername">Procurar usuário</label>
+                        <input type="text" id="searchUsername" class="form-control" placeholder="Digite o username...">
+                    </div>
+                    <div class="col-md-2 mb-3 mb-md-0">
+                        <button onclick="searchUser()" class="btn btn-search">
+                            <i class="fas fa-search"></i> Buscar
+                        </button>
+                    </div>
+                    <div class="col-md-4 text-md-right text-left">
+                        <button type="button" class="btn btn-add-user w-100 w-md-auto" data-toggle="modal" data-target="#addUserModal">
+                            <i class="fas fa-plus mr-2"></i> Novo Usuário
+                        </button>
+                    </div>
+                </div>
+
+                <div class="table-responsive-wrapper"> <table class="table operation-table">
+                        <thead>
+                            <tr>
+                                <th>Username</th>
+                                <th>Admin</th>
+                                <th>Data de Expiração</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            </tbody>   
+                    </table>
+                    
+                    <div id="no-users" class="text-center mt-5 mb-3 text-muted" style="display:none;">
+                        <h4><i class="fas fa-search-minus mb-2" style="font-size: 2rem;"></i><br>Nenhum usuário encontrado.</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="addUserModal" tabindex="-1" role="dialog" aria-labelledby="addUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addUserModalLabel">Adicionar Novo Usuário</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" id="addUserForm">
+                    <div class="form-group mb-3">
+                        <label for="addusername">Username</label>
+                        <input type="text" id="addusername" name="addusername" class="form-control" required placeholder="Ex: usuario123">
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="addpassword">Senha</label>
+                        <input type="password" id="addpassword" name="addpassword" class="form-control" required placeholder="******">
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="adddate_expiry">Data de Expiração</label>
+                        <input type="date" id="adddate_expiry" name="adddate_expiry" class="form-control">
+                    </div>
+                    <div class="text-right mt-4">
+                        <button type="button" class="btn btn-secondary mr-2" data-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-add-user">Salvar Usuário</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
+
+{% block javascripts %}
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<script>
+    async function loadUsers(searchTerm = null) {
+        const baseUrl = window.location.origin;
+        let endpoint = baseUrl + '/get_users';
+        if (searchTerm) {
+            endpoint += `?search=${searchTerm}`;
+        }
+        
+        try {
+            const response = await fetch(endpoint);
+            const users = await response.json();
+            const usersTableBody = document.querySelector('.table tbody');
+            usersTableBody.innerHTML = "";
+
+            if (users.length === 0) {
+                document.getElementById('no-users').style.display = 'block';
+            } else {
+                document.getElementById('no-users').style.display = 'none';
+                users.forEach(user => {
+                    let expiryDate = '<span class="badge badge-success">Permanente</span>';
+                    if (user.date_expiry) {
+                        const date = new Date(user.date_expiry);
+                        const utcDate = new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
+                        expiryDate = utcDate.toLocaleDateString('pt-BR');
+                    }
+                    
+                    const adminBadge = user.is_admin 
+                        ? '<span class="badge badge-primary">SIM</span>' 
+                        : '<span class="badge badge-secondary" style="background:#e2e6ea; color:#333;">NÃO</span>';
+
+                    // NOTA: Adicionei data-label="" para o modo responsivo funcionar
+                    usersTableBody.innerHTML += `
+                        <tr>
+                            <td data-label="Username" class="font-weight-bold" style="font-size:1.05rem;">${user.username}</td>
+                            <td data-label="Admin">${adminBadge}</td>
+                            <td data-label="Expiração">${expiryDate}</td>
+                            <td data-label="Ações">
+                                <button onclick="window.location.href='${baseUrl}/edit_user/${user.id}'" class="btn-action-edit mr-3" title="Editar">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button onclick="deleteUser('${user.id}', '${user.username}')" class="btn-action-delete" title="Remover">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            }
+        } catch (error) {
+            console.error("Erro ao carregar usuários:", error);
+        }
+    }
+
+    function searchUser() {
+        const searchTerm = document.getElementById('searchUsername').value;
+        loadUsers(searchTerm);
+    }
+
+    document.getElementById('addUserForm').addEventListener('submit', async function (e) {
+        e.preventDefault();
+        const username = document.getElementById('addusername').value;
+        const password = document.getElementById('addpassword').value;
+        const date_expiry = document.getElementById('adddate_expiry').value;
+        const baseUrl = window.location.origin;
+        
+        const response = await fetch(baseUrl + '/add_user', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password, date_expiry })
+        });
+        const result = await response.json();
+
+        swal("Aviso", result.message, result.success ? "success" : "info");
+        $('#addUserModal').modal('hide');
+        loadUsers();
+        this.reset();
+    });
+
+    async function deleteUser(userId, username) {
+        swal({
+            title: "Tem certeza?",
+            text: "Deseja excluir o usuário: " + username + "?",
+            icon: "warning",
+            buttons: ["Cancelar", "Sim, excluir"],
+            dangerMode: true,
+        })
+        .then(async (willDelete) => {
+            if (willDelete) {
+                const baseUrl = window.location.origin;
+                const response = await fetch(`${baseUrl}/delete_user/${userId}`, { method: 'DELETE' });
+                const result = await response.json();
+                swal("Usuário excluído!", { icon: "success" });
+                loadUsers();
+            }
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        loadUsers();
+    });
+</script>
+{% endblock javascripts %}

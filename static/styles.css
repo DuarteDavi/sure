@@ -1,0 +1,89 @@
+/* Estilização da tabela */
+.surebet-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background: #121212; /* Fundo preto */
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0, 255, 0, 0.2); /* Brilho verde sutil */
+    text-shadow: 0 0 5px red, 0 0 10px yellow, 0 0 15px lime;
+    animation: cassinoBrilhante 1.5s infinite alternate;
+}
+
+@keyframes cassinoBrilhante {
+0% {
+    text-shadow: 0 0 5px red, 0 0 10px yellow, 0 0 15px lime;
+}
+50% {
+    text-shadow: 0 0 5px blue, 0 0 10px cyan, 0 0 15px pink;
+}
+100% {
+    text-shadow: 0 0 5px orange, 0 0 10px green, 0 0 15px purple;
+}
+}
+
+.filtros 
+{
+    background-color: #0a6e29; /* Verde escuro */
+    color: #fff;
+    text-transform: uppercase
+}
+
+.surebet-table th, .surebet-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #333; /* Bordas discretas */
+}
+
+.surebet-table th {
+    background-color: #0a6e29; /* Verde escuro */
+    color: #fff;
+    text-transform: uppercase;
+}
+
+.surebet-table tr {
+    background-color: #1a1a1a; /* Fundo mais escuro */
+}
+
+.surebet-table tr:hover {
+    background-color: #0f421c; /* Verde escuro ao passar o mouse */
+}
+
+.surebet-table td {
+    color: #ddd; /* Texto claro */
+}
+
+/* Links de odds */
+.odds-link {
+    color: #00ff00; /* Verde neon */
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.odds-link:hover {
+    text-decoration: underline;
+    color: #33ff33;
+}
+.surebet-table h1 {
+    color: whitesmoke;
+    background-color: #0a6e29;
+    text-align: center;
+    font-size: 24px;
+    padding: 10px;
+    text-transform: uppercase;
+    text-shadow: 0 0 5px red, 0 0 10px yellow, 0 0 15px lime;
+    animation: cassinoBrilhante 1.5s infinite alternate;
+}
+
+@keyframes cassinoBrilhante {
+    0% {
+        text-shadow: 0 0 5px red, 0 0 10px yellow, 0 0 15px lime;
+    }
+    50% {
+        text-shadow: 0 0 5px blue, 0 0 10px cyan, 0 0 15px pink;
+    }
+    100% {
+        text-shadow: 0 0 5px orange, 0 0 10px green, 0 0 15px purple;
+    }
+}

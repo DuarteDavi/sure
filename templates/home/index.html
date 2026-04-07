@@ -1,0 +1,120 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} BetBra Radar Premium {% endblock title %}
+
+{% block stylesheets %}
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+<script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                colors: {
+                    backBlue: '#dbeafe',
+                    backBlueText: '#1e3a8a',
+                    darkBg: '#0f172a',
+                    cardBg: '#1e293b'
+                }
+            }
+        }
+    }
+</script>
+
+<style>
+    .main-panel .content { background-color: #0f172a !important; min-height: 100vh; }
+    [v-cloak] { display: none; }
+</style>
+{% endblock stylesheets %}
+
+{% block content %}
+<div id="app" v-cloak class="p-2 md:p-4">
+    
+    <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+        <div>
+            <h2 class="text-2xl font-bold text-white flex items-center">
+                <i class="fa-solid fa-bolt-lightning mr-3 text-yellow-400"></i>
+                Scanner Real-Time BetBra
+            </h2>
+            <p class="text-slate-400 text-sm">Odds direto da Exchange sem delay</p>
+        </div>
+
+        <div class="flex items-center gap-3">
+            <div :class="['px-4 py-2 rounded-full text-xs font-bold flex items-center transition-all', 
+                         status === 'Online' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/50' : 'bg-red-500/20 text-red-400 border border-red-500/50']">
+                <span :class="['w-2 h-2 rounded-full mr-2', status === 'Online' ? 'bg-emerald-400 animate-pulse' : 'bg-red-400']"></span>
+                [[ status ]]
+            </div>
+        </div>
+    </div>
+
+    <div v-if="surebets.length > 0" class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+        <div v-for="sb in filteredSurebets" :key="sb.id" class="bg-cardBg rounded-xl border border-slate-700 hover:border-blue-500/50 transition-all shadow-xl overflow-hidden flex flex-col group">
+            <div class="bg-slate-800/80 px-5 py-3 border-b border-slate-700 flex justify-between items-center">
+                <span class="bg-blue-600 text-white text-[10px] font-black px-2 py-1 rounded uppercase">[[ sb.roi ]]</span>
+                <span class="text-slate-400 text-xs italic">[[ sb.age ]]</span>
+            </div>
+
+            <div class="p-5 flex-1">
+                <div v-for="(leg, index) in sb.legs" :key="index" class="mb-4 last:mb-0 relative">
+                    <div class="flex items-start gap-4">
+                        <div class="w-6 h-6 rounded-full bg-slate-700 text-[10px] flex items-center justify-center font-bold text-white shrink-0 mt-1">[[ index + 1 ]]</div>
+                        <div class="flex-grow overflow-hidden">
+                            <span class="text-blue-400 font-bold text-xs uppercase tracking-tighter">[[ leg.bookmaker ]]</span>
+                            <h3 class="text-white font-medium text-sm truncate">[[ leg.event ]]</h3>
+                            <p class="text-slate-500 text-[11px] truncate">[[ leg.market ]]</p>
+                        </div>
+                        <div class="bg-backBlue text-backBlueText font-black px-3 py-2 rounded min-w-[55px] text-center">[[ leg.odd ]]</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div v-else class="flex flex-col items-center justify-center py-20 text-slate-600">
+        <i class="fa-solid fa-satellite-dish text-6xl mb-4 animate-pulse"></i>
+        <p class="text-xl">Aguardando sinais do motor...</p>
+    </div>
+
+</div>
+{% endblock content %}
+
+{% block javascripts %}
+<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+
+<script>
+    const { createApp } = Vue
+    createApp({
+        delimiters: ['[[', ']]'], 
+        data() {
+            return {
+                status: 'Conectando...',
+                searchQuery: '',
+                surebets: []
+            }
+        },
+        computed: {
+            filteredSurebets() {
+                if (!this.searchQuery) return this.surebets;
+                const q = this.searchQuery.toLowerCase();
+                return this.surebets.filter(sb => sb.legs.some(l => l.event.toLowerCase().includes(q)));
+            }
+        },
+        mounted() {
+            const socket = io();
+            socket.on('connect', () => { this.status = 'Online'; });
+            socket.on('disconnect', () => { this.status = 'Desconectado'; });
+            socket.on('nova_surebet_front', (data) => {
+    const index = this.surebets.findIndex(sb => sb.id === data.id);
+    if (index !== -1) {
+        this.surebets[index] = data; // atualiza o existente
+    } else {
+        this.surebets.unshift(data); // adiciona novo
+        if (this.surebets.length > 30) this.surebets.pop();
+    }
+});
+        }
+    }).mount('#app')
+</script>
+{% endblock javascripts %}
